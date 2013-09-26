@@ -3,9 +3,9 @@ module BitBalloon
     attr_reader :client
 
     def self.fields(*names)
-      return @@fields if names.empty?
+      return @fields if names.empty?
 
-      @@fields ||= []
+      @fields ||= []
 
       names.each do |name|
         define_method name do
@@ -16,14 +16,13 @@ module BitBalloon
           @attributes[name.to_sym] = value
         end
 
-        @@fields.push(name.to_sym)
+        @fields.push(name.to_sym)
       end
     end
 
     def self.collection(value = nil)
-      @@collection ||= BitBalloon.const_get(to_s.split("::").last + "s")
+      @collection ||= BitBalloon.const_get(to_s.split("::").last + "s")
     end
-
 
     def initialize(client, attributes)
       @client = client
@@ -35,6 +34,12 @@ module BitBalloon
       self.class.fields.each do |field|
         @attributes[field] = attributes[field] || attributes[field.to_s]
       end
+      self
+    end
+
+    def refresh
+      response = client.request(:get, path)
+      process(response.parsed)
     end
 
     def collection
@@ -42,7 +47,7 @@ module BitBalloon
     end
 
     def path
-      File.join(collection.path, id)
+      ::File.join(collection.path, id)
     end
   end
 end

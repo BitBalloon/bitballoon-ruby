@@ -13,8 +13,8 @@ class SitesTest < MiniTest::Unit::TestCase
 
   def test_create_from_dir
     body = nil
-    dir = File.expand_path("../files/site-dir", __FILE__)
-    index_sha = Digest::SHA1.hexdigest(File.read(File.join(dir, "index.html")))
+    dir = ::File.expand_path("../files/site-dir", __FILE__)
+    index_sha = Digest::SHA1.hexdigest(::File.read(::File.join(dir, "index.html")))
 
     stub_request(:post, "https://www.bitballoon.com/api/v1/sites")
       .to_return {|request|
@@ -34,6 +34,19 @@ class SitesTest < MiniTest::Unit::TestCase
     assert_equal index_sha, body['files']['/index.html']
 
     assert_requested :put, "https://www.bitballoon.com/api/v1/sites/1234/files/index.html",
-      :body => File.read(File.join(dir, "index.html")), :times => 1    # ===> Success
+      :body => ::File.read(::File.join(dir, "index.html")), :times => 1    # ===> Success
+  end
+
+  def test_create_from_zip
+    stub_request(:post, "https://www.bitballoon.com/api/v1/sites")
+      .to_return({
+        :headers => {'Content-Type' => 'application/json'},
+        :body => JSON.generate({:id => "1234", :state => "processing", :required => []})
+      })
+
+    zip = ::File.expand_path("../files/site-dir.zip", __FILE__)
+    site = client.sites.create(:zip => zip)
+
+    assert_equal 'processing', site.state
   end
 end

@@ -2,7 +2,7 @@ require 'oauth2'
 
 module BitBalloon
   class Client
-    ENDPOINT    = ENV['OAUTH_CLIENT_API_URL'] || 'https://www.bitballoon.com/api/v1'
+    ENDPOINT    = ENV['OAUTH_CLIENT_API_URL'] || 'https://www.bitballoon.com'
     API_VERSION = "v1"
 
     attr_accessor :client_id, :client_secret, :oauth, :access_token
@@ -11,7 +11,11 @@ module BitBalloon
       self.client_id     = options[:client_id]
       self.client_secret = options[:client_secret]
       self.access_token  = options[:access_token]
-      self.oauth         = OAuth2::Client.new(client_id, client_secret, :site => ENDPOINT)
+      self.oauth         = OAuth2::Client.new(client_id, client_secret, :site => ENDPOINT, :connection_build => lambda {|f|
+        f.request :multipart
+        f.request :url_encoded
+        f.adapter :net_http
+      })
     end
 
     def authorize_url(options)
@@ -34,7 +38,7 @@ module BitBalloon
 
     def request(verb, path, opts={}, &block)
       raise "Authorize with BitBalloon before making requests" unless oauth_token
-      oauth_token.request(verb, File.join("/api", API_VERSION, path), opts, &block)
+      oauth_token.request(verb, ::File.join("/api", API_VERSION, path), opts, &block)
     end
 
     private

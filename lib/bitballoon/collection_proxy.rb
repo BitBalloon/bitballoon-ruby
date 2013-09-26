@@ -2,23 +2,24 @@ module BitBalloon
   class CollectionProxy
     include Enumerable
 
-    attr_accessor :client
+    attr_accessor :client, :prefix
 
     def self.path(value = nil)
-      return @@path unless value
-      @@path = value
+      return @path unless value
+      @path = value
     end
 
     def self.model(value = nil)
-      @@model ||= BitBalloon.const_get(to_s.split("::").last.sub(/s$/, ''))
+      @model ||= BitBalloon.const_get(to_s.split("::").last.sub(/s$/, ''))
     end
 
-    def initialize(client)
+    def initialize(client, prefix = nil)
       self.client = client
+      self.prefix = prefix
     end
 
     def all
-      response = client.request(:get, path)
+      response = client.request(:get, [prefix, path].compact.join("/"))
       response.parsed.map {|attributes| model.new(client, attributes) } if response.parsed
     end
 
@@ -27,7 +28,7 @@ module BitBalloon
     end
 
     def get(id)
-      response = client.request(:get, File.join(path, id))
+      response = client.request(:get, ::File.join(path, id))
       model.new(client, response.parsed) if response.parsed
     end
 
