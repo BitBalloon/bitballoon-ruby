@@ -13,6 +13,7 @@ module BitBalloon
       Dir[File.join(dir, "**", "*")].each do |file|
         next unless File.file?(file)
         pathname = File.join("/", file[dir.length..-1])
+        next if pathname.match(/(^\/?__MACOSX\/|\/\.)/)
         shas[Digest::SHA1.hexdigest(File.read(file))] = pathname
       end
 
