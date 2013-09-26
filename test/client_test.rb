@@ -1,4 +1,3 @@
-require 'json'
 require 'test_helper'
 
 class ClientTest < MiniTest::Unit::TestCase
@@ -35,7 +34,7 @@ class ClientTest < MiniTest::Unit::TestCase
   end
 
   def test_simple_get_request
-    stub_request(:get, "https://www.bitballoon.com/sites")
+    stub_request(:get, "https://www.bitballoon.com/api/v1/sites")
       .with(:headers => {'Authorization' => "Bearer access_token"})
       .to_return(
         :headers => {'Content-Type' => 'application/json'},
@@ -48,7 +47,7 @@ class ClientTest < MiniTest::Unit::TestCase
   end
 
   def test_sites
-    stub_request(:get, "https://www.bitballoon.com/sites")
+    stub_request(:get, "https://www.bitballoon.com/api/v1/sites")
       .with(:headers => {'Authorization' => "Bearer access_token"})
       .to_return(
         :headers => {'Content-Type' => 'application/json'},
@@ -57,5 +56,18 @@ class ClientTest < MiniTest::Unit::TestCase
     client.access_token = "access_token"
     sites = client.sites.all
     assert_equal "http://www.example.com", sites.first.url
+  end
+
+  def test_get_site
+    stub_request(:get, "https://www.bitballoon.com/api/v1/sites/1234")
+      .with(:headers => {'Authorization' => "Bearer access_token"})
+      .to_return(
+        :headers => {'Content-Type' => 'application/json'},
+        :body => {:url => "http://www.example.com"}
+      )
+
+    client.access_token = "access_token"
+    site = client.sites.get("1234")
+    assert_equal "http://www.example.com", site.url
   end
 end

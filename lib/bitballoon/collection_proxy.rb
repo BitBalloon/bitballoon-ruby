@@ -1,5 +1,7 @@
 module BitBalloon
   class CollectionProxy
+    include Enumerable
+
     attr_accessor :client
 
     def self.path(value = nil)
@@ -8,8 +10,7 @@ module BitBalloon
     end
 
     def self.model(value = nil)
-      return @@model unless value
-      @@model = value
+      @@model ||= BitBalloon.const_get(to_s.split("::").last.sub(/s$/, ''))
     end
 
     def initialize(client)
@@ -18,12 +19,16 @@ module BitBalloon
 
     def all
       response = client.request(:get, path)
-      response.parsed.map {|attributes| model.new(attributes) } if response.parsed
+      response.parsed.map {|attributes| model.new(client, attributes) } if response.parsed
+    end
+
+    def each(&block)
+      all.each(&block)
     end
 
     def get(id)
       response = client.request(:get, File.join(path, id))
-      model.new(response.parsed) if response.parsed
+      model.new(client, response.parsed) if response.parsed
     end
 
     def model

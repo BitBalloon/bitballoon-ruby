@@ -1,5 +1,7 @@
 module BitBalloon
   class Model
+    attr_reader :client
+
     def self.fields(*names)
       return @@fields if names.empty?
 
@@ -18,12 +20,29 @@ module BitBalloon
       end
     end
 
-    def initialize(attributes)
-      @attributes = {}
+    def self.collection(value = nil)
+      @@collection ||= BitBalloon.const_get(to_s.split("::").last + "s")
+    end
 
+
+    def initialize(client, attributes)
+      @client = client
+      @attributes = {}
+      process(attributes)
+    end
+
+    def process(attributes)
       self.class.fields.each do |field|
         @attributes[field] = attributes[field] || attributes[field.to_s]
       end
+    end
+
+    def collection
+      self.class.collection
+    end
+
+    def path
+      File.join(collection.path, id)
     end
   end
 end
