@@ -32,7 +32,9 @@ module BitBalloon
 
     def process(attributes)
       self.class.fields.each do |field|
-        @attributes[field] = attributes[field] || attributes[field.to_s]
+        if attributes.has_key?(field) || attributes.has_key?(field.to_s)
+          @attributes[field] = attributes[field] || attributes[field.to_s]
+        end
       end
       self
     end

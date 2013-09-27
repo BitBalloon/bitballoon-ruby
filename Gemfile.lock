@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bitballoon (0.0.2)
+    bitballoon (0.0.3)
       highline
       oauth2 (>= 0.9.2)
       slop

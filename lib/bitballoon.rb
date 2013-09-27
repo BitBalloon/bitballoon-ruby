@@ -7,7 +7,6 @@ require "bitballoon/sites"
 require "bitballoon/forms"
 require "bitballoon/submissions"
 require "bitballoon/files"
+require "bitballoon/snippets"
 
-module BitBalloon
-  # Your code goes here...
-end
+module BitBalloon; end

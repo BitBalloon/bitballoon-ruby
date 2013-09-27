@@ -51,91 +51,145 @@ Sites
 
 Getting a list of all sites you have access to:
 
+```ruby
     bitballoon.sites.each do |site|
       puts site.url
     end
+```
 
 Getting a specific site by id:
 
+```ruby
     site = bitballoon.sites.get(id)
+```
 
 Creating a site from a directory:
 
+```ruby
     site = bitballoon.sites.create(:dir => "/tmp/my-site")
+```
 
 Creating a site from a zip file:
 
+```ruby
     site = bitballoon.sites.create(:zip => "/tmp/my-site.zip")
+```
 
 Both methods will create the site and upload the files. The site will then be processing.
 
+```ruby
     site.state == "processing"
     site.processing? == true
+```
 
 Refresh a site to update the state:
 
+```ruby
     site.refresh
+```
 
 Use `wait_until_ready` to wait until a site has finished processing.
 
+```ruby
     site = bitballoon.sites.create(:dir => "/tmp/my-site")
     site.wait_for_ready
     site.state == "ready"
+```
 
 Update the name of the site (its subdomain), the custom domain and the notification email for form submissions:
 
-    site.update(:subdomain => "my-site", :custom_domain => "www.example.com", :notification_email => "me@example.com")
+```ruby
+    site.update(:name => "my-site", :custom_domain => "www.example.com", :notification_email => "me@example.com")
+```
 
 Deleting a site:
 
+```ruby
     site.destroy!
+```
 
 Forms
 =====
 
 Access all forms you have access to:
 
-    bitballoon.forms
+```ruby
+    bitballoon.forms.all
+```
 
 Access forms for a specific site:
 
+```ruby
     site = bitballoon.sites.get(id)
-    site.forms
-    
+    site.forms.all
+```
+
 Access a specific form:
 
+```ruby
     form = bitballoon.forms.get(id)
+```
 
 Access a list of all form submissions you have access to:
 
-    bitballoon.submissions
+```ruby
+    bitballoon.submissions.all
+```
 
 Access submissions from a specific site
 
+```ruby
     site = bitballoon.sites.get(id)
-    site.submissions
+    site.submissions.all
+```
 
 Access submissions from a specific form
 
+```ruby
     form = bitballoon.forms.get(id)
-    form.submissions
+    form.submissions.all
+```
 
 Get a specific submission
 
+```ruby
     bitballoon.submissions.get(id)
+```
 
 Files
 =====
 
 Access all files in a site:
 
+```ruby
     site = bitballoon.sites.get(id)
-    site.files
+    site.files.all
+```
 
 Get a specific file:
 
+```ruby
     file = site.files.get(path) # Example paths: "/css/main.css", "/index.html"
+```
 
 Reading a file:
 
+```ruby
     file.read
+```
+
+Snippets
+========
+
+Snippets are small code snippets injected into all HTML pages of a site right before the closing head or body tag. To get all snippets for a site:
+
+```ruby
+    site = bitballoon.sites.get(id)
+    site.snippets.all
+```
+
+Get a specific snippet
+
+```ruby
+    site.snippets.get(0)
+```

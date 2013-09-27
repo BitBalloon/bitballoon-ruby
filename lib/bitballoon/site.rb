@@ -40,7 +40,9 @@ module BitBalloon
     end
 
     def update(attributes)
-      raise "Not implemented yet"
+      response = client.request(:put, path, :body => mutable_attributes(attributes))
+      process(response.parsed)
+      self
     end
 
     def destroy!
@@ -58,6 +60,19 @@ module BitBalloon
 
     def files
       Files.new(client, path)
+    end
+
+    def snippets
+      Snippets.new(client, path)
+    end
+
+    private
+    def mutable_attributes(attributes)
+      Hash[*[:name, :custom_domain, :notification_email].map {|key|
+        if attributes.has_key?(key) || attributes.has_key?(key.to_s)
+          [key, attributes[key] || attributes[key.to_s]]
+        end
+      }.compact.flatten]
     end
   end
 end
