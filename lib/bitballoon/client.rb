@@ -36,6 +36,14 @@ module BitBalloon
       Sites.new(self)
     end
 
+    def forms
+      Forms.new(self)
+    end
+
+    def submissions
+      Submissions.new(self)
+    end
+
     def request(verb, path, opts={}, &block)
       raise "Authorize with BitBalloon before making requests" unless oauth_token
       oauth_token.request(verb, ::File.join("/api", API_VERSION, path), opts, &block)
