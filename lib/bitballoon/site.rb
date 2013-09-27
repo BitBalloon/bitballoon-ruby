@@ -33,6 +33,7 @@ module BitBalloon
       while !ready?
         sleep 5
         refresh
+        yield(self) if block_given?
         raise "Timeout while waiting for ready" if Time.now - start > timeout
       end
       self

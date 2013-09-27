@@ -16,16 +16,17 @@ opts = Slop.parse do
       raise "File or dir doesn't exist: #{path}" unless File.exist?(path)
       raise "Can't deploy a single file" if File.file?(path) && !path.match(/\.zip$/)
 
-      client = BitBalloon.client(:client_id => credentials["client_id"], :client_secret => credentials["client_secret"])
 
-      credentials_path = File.exist?(File.expand_path(".bitballoon")) ? File.expand_path(".bitballoon") : "~/.bitballoon"
+
+      credentials_path = File.exist?(File.expand_path(".bitballoon")) ? File.expand_path(".bitballoon") : "#{Dir.home}/.bitballoon"
       if File.exist?(credentials_path)
         access_token = JSON.parse(File.read(credentials_path))['access_token']
-        client_id.access_token = access_token
+        client = BitBalloon::Client.new(:access_token => access_token)
       else
-        credentials = {}
-        credentials["client_id"] = ask("Client ID:")
-        credentials["client_secret"] = ask("Client Secret:")
+        puts "Please enter your BitBalloon API Credentials (if you don't have any, you can create your credentials at https://www.bitballoon.com/applications)"
+        client_id = ask("Client ID:")
+        client_secret = ask("Client Secret:")
+        client = BitBalloon::Client.new(:client_id => client_id, :client_secret => client_secret)
         client.authorize_from_credentials!
         File.open(credentials_path, "w") do |file|
           file.write(JSON.generate(:access_token => client.access_token))
@@ -33,9 +34,11 @@ opts = Slop.parse do
         puts "Wrote access token to '#{credentials_path}'"
       end
 
-      site = path.match(/\.zip$/) ? client.sites.create(:zip => path) : client.site.create(:dir => path)
+      site = path.match(/\.zip$/) ? client.sites.create(:zip => path) : client.sites.create(:dir => path)
       puts "Waiting for processing"
-      site.wait_for_ready
+      site.wait_for_ready do |site|
+        puts "Polling site: #{site.id} - #{site.state}"
+      end
       puts "Site deployed: #{site.url}"
     end
   end
