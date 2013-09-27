@@ -18,6 +18,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency "oauth2", ">=  0.9.2"
+  gem.add_dependency "slop"
+  gem.add_dependency "highline"
   gem.add_development_dependency "minitest"
   gem.add_development_dependency "webmock"
 end

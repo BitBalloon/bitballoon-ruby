@@ -1,3 +1,4 @@
+require "json"
 require "bitballoon/version"
 require "bitballoon/client"
 require "bitballoon/collection_proxy"

@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+require 'slop'
+require 'bitballoon'
+require 'highline/import'
+
+opts = Slop.parse do
+  on '-v', 'Print the version' do
+    puts "Version #{BitBalloon::VERSION}"
+  end
+
+  command 'deploy' do
+    run do |opts, args|
+      path = args.first ? File.expand_path(args.first) : Dir.getwd
+
+      raise "File or dir doesn't exist: #{path}" unless File.exist?(path)
+      raise "Can't deploy a single file" if File.file?(path) && !path.match(/\.zip$/)
+
+      client = BitBalloon.client(:client_id => credentials["client_id"], :client_secret => credentials["client_secret"])
+
+      credentials_path = File.exist?(File.expand_path(".bitballoon")) ? File.expand_path(".bitballoon") : "~/.bitballoon"
+      if File.exist?(credentials_path)
+        access_token = JSON.parse(File.read(credentials_path))['access_token']
+        client_id.access_token = access_token
+      else
+        credentials = {}
+        credentials["client_id"] = ask("Client ID:")
+        credentials["client_secret"] = ask("Client Secret:")
+        client.authorize_from_credentials!
+        File.open(credentials_path, "w") do |file|
+          file.write(JSON.generate(:access_token => client.access_token))
+        end
+        puts "Wrote access token to '#{credentials_path}'"
+      end
+
+      site = path.match(/\.zip$/) ? client.sites.create(:zip => path) : client.site.create(:dir => path)
+      puts "Waiting for processing"
+      site.wait_for_ready
+      puts "Site deployed: #{site.url}"
+    end
+  end
+end
