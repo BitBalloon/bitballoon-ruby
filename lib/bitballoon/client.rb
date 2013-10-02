@@ -5,6 +5,12 @@ module BitBalloon
     ENDPOINT    = ENV['OAUTH_CLIENT_API_URL'] || 'https://www.bitballoon.com'
     API_VERSION = "v1"
 
+    class BitBalloonError < StandardError; end
+    class NotFoundError < BitBalloonError; end
+    class ConnectionError < BitBalloonError; end
+    class InternalServerError < BitBalloonError; end
+    class AuthenticationError < BitBalloonError; end
+
     attr_accessor :client_id, :client_secret, :oauth, :access_token
 
     def initialize(options)
@@ -45,13 +51,31 @@ module BitBalloon
     end
 
     def request(verb, path, opts={}, &block)
-      raise "Authorize with BitBalloon before making requests" unless oauth_token
+      raise AuthenticationError, "Authorize with BitBalloon before making requests" unless oauth_token
+
       oauth_token.request(verb, ::File.join("/api", API_VERSION, path), opts, &block)
+    rescue OAuth2::Error => e
+      case e.response.status
+      when 401
+        raise AuthenticationError, message_for(e, "Authentication Error")
+      when 404
+        raise NotFoundError, message_for(e, "Not Found")
+      when 500
+        raise InternalServerError, message_for(e, "Internal Server Error")
+      else
+        raise BitBalloonError, message_for(e, "OAuth2 Error")
+      end
+    rescue Faraday::Error::ConnectionFailed => e
+      raise ConnectionError, message_for(e, "Connection Error")
     end
 
     private
     def oauth_token
       @oauth_token ||= access_token && OAuth2::AccessToken.new(oauth, access_token)
+    end
+
+    def message_for(error, default)
+      error.message.strip == "" ? default : error.message
     end
   end
 end

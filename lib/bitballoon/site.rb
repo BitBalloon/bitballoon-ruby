@@ -3,8 +3,8 @@ require 'digest/sha1'
 module BitBalloon
   class Site < Model
     fields :id, :state, :premium, :claimed, :name, :custom_domain, :url,
-           :admin_url, :screenshot_url, :created_at, :updated_at, :user_id,
-           :required
+           :admin_url, :deploy_url, :screenshot_url, :created_at, :updated_at,
+           :user_id, :required
 
     def upload_dir(dir)
       return unless state == "uploading"
