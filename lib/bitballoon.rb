@@ -8,5 +8,6 @@ require "bitballoon/forms"
 require "bitballoon/submissions"
 require "bitballoon/files"
 require "bitballoon/snippets"
+require "bitballoon/deploys"
 
 module BitBalloon; end
