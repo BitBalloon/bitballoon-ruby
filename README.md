@@ -46,40 +46,65 @@ If you're not authenticating on behalf of a user you can authorize directly with
 bitballoon.authorize_from_credentials!
 ```
 
+Command Line Utility
+====================
+
+The BitBalloon gem comes with a handy command line utility for deploying and redeploying sites.
+
+To deploy the site in the current working directory:
+
+```ruby
+bitballoon deploy
+```
+
+The first time you deploy, you will be asked for your `client id` and `client secret`. After the deploy the tool will store an `access_token` and the `site_id` in `.bitballoon`. Next time you run the command the tool will redeploy the site using the stored `access_token`.
+
+You can also deploy a specific path:
+
+```ruby
+bitballoon deploy /path/to/my/site
+```
+
+Or a zip file:
+
+```ruby
+bitballoon deploy /path/to/my/site.zip
+```
+
 Sites
 =====
 
 Getting a list of all sites you have access to:
 
 ```ruby
-    bitballoon.sites.each do |site|
-      puts site.url
-    end
+bitballoon.sites.each do |site|
+  puts site.url
+end
 ```
 
 Getting a specific site by id:
 
 ```ruby
-    site = bitballoon.sites.get(id)
+site = bitballoon.sites.get(id)
 ```
 
 Creating a site from a directory:
 
 ```ruby
-    site = bitballoon.sites.create(:dir => "/tmp/my-site")
+site = bitballoon.sites.create(:dir => "/tmp/my-site")
 ```
 
 Creating a site from a zip file:
 
 ```ruby
-    site = bitballoon.sites.create(:zip => "/tmp/my-site.zip")
+site = bitballoon.sites.create(:zip => "/tmp/my-site.zip")
 ```
 
 Both methods will create the site and upload the files. The site will then be processing.
 
 ```ruby
-    site.state == "processing"
-    site.processing? == true
+site.state == "processing"
+site.processing? == true
 ```
 
 Refresh a site to update the state:
@@ -91,9 +116,25 @@ Refresh a site to update the state:
 Use `wait_until_ready` to wait until a site has finished processing.
 
 ```ruby
-    site = bitballoon.sites.create(:dir => "/tmp/my-site")
-    site.wait_for_ready
-    site.state == "ready"
+site = bitballoon.sites.create(:dir => "/tmp/my-site")
+site.wait_for_ready
+site.state == "ready"
+```
+
+Redeploy a site from a dir:
+
+```ruby
+site = bitballoon.sites.get(site_id)
+site.update(:dir => "/tmp/my-site")
+site.wait_for_ready
+```
+
+Redeploy a site from a zip file:
+
+```ruby
+site = bitballoon.sites.get(site_id)
+site.update(:zip => "/tmp/my-site.zip")
+site.wait_for_ready
 ```
 
 Update the name of the site (its subdomain), the custom domain and the notification email for form submissions:
