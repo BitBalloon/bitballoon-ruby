@@ -4,7 +4,7 @@ module BitBalloon
   class Site < Model
     fields :id, :state, :premium, :claimed, :name, :custom_domain, :url,
            :admin_url, :deploy_url, :screenshot_url, :created_at, :updated_at,
-           :user_id, :required, :error_message
+           :password, :notification_email, :user_id, :required, :error_message
 
     def upload_dir(dir)
       return unless state == "uploading"
@@ -78,7 +78,7 @@ module BitBalloon
 
     private
     def mutable_attributes(attributes)
-      Hash[*[:name, :custom_domain, :notification_email].map {|key|
+      Hash[*[:name, :custom_domain, :password, :notification_email].map {|key|
         if attributes.has_key?(key) || attributes.has_key?(key.to_s)
           [key, attributes[key] || attributes[key.to_s]]
         end
