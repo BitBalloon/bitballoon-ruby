@@ -6,15 +6,18 @@ module BitBalloon
     path "/sites"
 
     def create(attributes = {})
+      site_id = attributes.delete(:id)
+      path    = site_id ? "/sites/#{site_id}" : "/sites"
+      method  = site_id ? :put : :post
       if attributes[:dir]
         dir = attributes[:dir]
-        response = client.request(:post, "/sites", :body => JSON.generate({:files => inventory(dir)}), :headers => {"Content-Type" => "application/json"})
+        response = client.request(method, path, :body => JSON.generate({:files => inventory(dir)}), :headers => {"Content-Type" => "application/json"})
         Site.new(client, response.parsed).tap do |site|
           site.upload_dir(dir)
         end
       elsif attributes[:zip]
         ::File.open(attributes[:zip]) do |file|
-          response = client.request(:post, "/sites", :body => {
+          response = client.request(method, path, :body => {
             :zip => Faraday::UploadIO.new(file, 'application/zip')
           })
           Site.new(client, response.parsed)

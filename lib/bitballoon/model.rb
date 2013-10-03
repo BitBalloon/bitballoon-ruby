@@ -1,6 +1,6 @@
 module BitBalloon
   class Model
-    attr_reader :client
+    attr_reader :client, :attributes
 
     def self.fields(*names)
       return @fields if names.empty?

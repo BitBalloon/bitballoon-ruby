@@ -12,33 +12,44 @@ opts = Slop.parse do
   command 'deploy' do
     run do |opts, args|
       path = args.first ? File.expand_path(args.first) : Dir.getwd
+      zip = path.match(/\.zip$/)
 
       raise "File or dir doesn't exist: #{path}" unless File.exist?(path)
-      raise "Can't deploy a single file" if File.file?(path) && !path.match(/\.zip$/)
+      raise "Can't deploy a single file" if File.file?(path) && !zip
 
+      credentials_path = File.expand_path(".bitballoon", zip ? File.dirname(path) : path)
 
-
-      credentials_path = File.exist?(File.expand_path(".bitballoon")) ? File.expand_path(".bitballoon") : "#{Dir.home}/.bitballoon"
       if File.exist?(credentials_path)
-        access_token = JSON.parse(File.read(credentials_path))['access_token']
-        client = BitBalloon::Client.new(:access_token => access_token)
+        credentials = JSON.parse(File.read(credentials_path))
+        client = BitBalloon::Client.new(:access_token => credentials['access_token'])
       else
         puts "Please enter your BitBalloon API Credentials (if you don't have any, you can create your credentials at https://www.bitballoon.com/applications)"
         client_id = ask("Client ID:")
         client_secret = ask("Client Secret:")
         client = BitBalloon::Client.new(:client_id => client_id, :client_secret => client_secret)
         client.authorize_from_credentials!
-        File.open(credentials_path, "w") do |file|
-          file.write(JSON.generate(:access_token => client.access_token))
-        end
-        puts "Wrote access token to '#{credentials_path}'"
+        credentials = {'access_token' => client.access_token}
       end
 
-      site = path.match(/\.zip$/) ? client.sites.create(:zip => path) : client.sites.create(:dir => path)
+      attributes = zip ? {:zip => path} : {:dir => path}
+
+      if credentials['site_id']
+        site = client.sites.get(credentials['site_id'])
+        site.update(attributes)
+      else
+        site = client.sites.create(attributes)
+      end
       puts "Waiting for processing"
       site.wait_for_ready do |site|
         puts "Polling site: #{site.id} - #{site.state}"
       end
+
+      credentials['site_id'] = site.id
+
+      File.open(credentials_path, "w") do |file|
+        file.write(JSON.generate(credentials))
+      end
+
       puts "Site deployed: #{site.url}"
     end
   end

@@ -4,7 +4,7 @@ module BitBalloon
   class Site < Model
     fields :id, :state, :premium, :claimed, :name, :custom_domain, :url,
            :admin_url, :deploy_url, :screenshot_url, :created_at, :updated_at,
-           :user_id, :required
+           :user_id, :required, :error_message
 
     def upload_dir(dir)
       return unless state == "uploading"
@@ -25,14 +25,19 @@ module BitBalloon
     end
 
     def ready?
-      state == "ready"
+      state == "current"
+    end
+
+    def error?
+      state == "error"
     end
 
     def wait_for_ready(timeout = 900)
       start = Time.now
-      while !ready?
+      while !(ready?)
         sleep 5
         refresh
+        raise "Error processing site: #{error_message}" if error?
         yield(self) if block_given?
         raise "Timeout while waiting for ready" if Time.now - start > timeout
       end
@@ -40,8 +45,13 @@ module BitBalloon
     end
 
     def update(attributes)
-      response = client.request(:put, path, :body => mutable_attributes(attributes))
-      process(response.parsed)
+      if attributes[:zip] || attributes[:dir]
+        site = collection.new(client).create(attributes.merge(:id => id))
+        process(site.attributes)
+      else
+        response = client.request(:put, path, :body => mutable_attributes(attributes))
+        process(response.parsed)
+      end
       self
     end
 
