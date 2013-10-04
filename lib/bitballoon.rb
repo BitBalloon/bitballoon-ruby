@@ -9,5 +9,6 @@ require "bitballoon/submissions"
 require "bitballoon/files"
 require "bitballoon/snippets"
 require "bitballoon/deploys"
+require "bitballoon/multipass"
 
 module BitBalloon; end
