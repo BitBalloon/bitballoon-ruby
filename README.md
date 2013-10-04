@@ -46,6 +46,15 @@ If you're not authenticating on behalf of a user you can authorize directly with
 bitballoon.authorize_from_credentials!
 ```
 
+If you already have an OAuth2 `access_token` you can instantiate the client like this:
+
+```ruby
+bitballoon = BitBalloon::Client.new(:access_token => access_token)
+```
+
+And the client will be ready to do requests. This means that once you've gotten a token via `authorize!` or `authorize_from_credentials!` you can store it and reuse it for later sessions.
+
+
 Command Line Utility
 ====================
 
