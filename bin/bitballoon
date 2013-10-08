@@ -17,7 +17,7 @@ opts = Slop.parse do
       raise "File or dir doesn't exist: #{path}" unless File.exist?(path)
       raise "Can't deploy a single file" if File.file?(path) && !zip
 
-      credentials_path = File.expand_path(".bitballoon", zip ? File.dirname(path) : path)
+      credentials_path = File.expand_path(".bitballoon")
 
       if File.exist?(credentials_path)
         credentials = JSON.parse(File.read(credentials_path))
