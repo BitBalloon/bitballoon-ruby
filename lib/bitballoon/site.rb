@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'uri'
 
 module BitBalloon
   class Site < Model
@@ -18,7 +19,7 @@ module BitBalloon
       end
 
       (required || []).each do |sha|
-        client.request(:put, ::File.join(path, "files", shas[sha]), :body => ::File.read(::File.join(dir, shas[sha])))
+        client.request(:put, ::File.join(path, "files", URI.encode(shas[sha])), :body => ::File.read(::File.join(dir, shas[sha])), :headers => {"Content-Type" => "application/octet-stream"})
       end
 
       refresh
