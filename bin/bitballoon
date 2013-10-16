@@ -10,6 +10,9 @@ opts = Slop.parse do
   end
 
   command 'deploy' do
+    on :a=, :'access-token=', 'API Access Token'
+    on :s=, :'site-id=', 'BitBalloon site id'
+
     run do |opts, args|
       path = args.first ? File.expand_path(args.first) : Dir.getwd
       zip = path.match(/\.zip$/)
@@ -17,10 +20,13 @@ opts = Slop.parse do
       raise "File or dir doesn't exist: #{path}" unless File.exist?(path)
       raise "Can't deploy a single file" if File.file?(path) && !zip
 
-      credentials_path = File.expand_path(".bitballoon")
+      credentials_path = opts[:a] ? nil : File.expand_path(".bitballoon")
 
-      if File.exist?(credentials_path)
+      if credentials_path && File.exist?(credentials_path)
         credentials = JSON.parse(File.read(credentials_path))
+        client = BitBalloon::Client.new(:access_token => credentials['access_token'])
+      elsif opts[:a]
+        credentials = {'access_token' => opts[:a]}
         client = BitBalloon::Client.new(:access_token => credentials['access_token'])
       else
         puts "Please enter your BitBalloon API Credentials (if you don't have any, you can create your credentials at https://www.bitballoon.com/applications)"
@@ -30,6 +36,8 @@ opts = Slop.parse do
         client.authorize_from_credentials!
         credentials = {'access_token' => client.access_token}
       end
+
+      credentials['site_id'] = opts[:s] if opts[:s]
 
       attributes = zip ? {:zip => path} : {:dir => path}
 
@@ -48,7 +56,7 @@ opts = Slop.parse do
 
       File.open(credentials_path, "w") do |file|
         file.write(JSON.generate(credentials))
-      end
+      end if credentials_path
 
       puts "Site deployed: #{site.url}"
     end
