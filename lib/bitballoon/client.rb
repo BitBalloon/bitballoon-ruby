@@ -4,6 +4,7 @@ module BitBalloon
   class Client
     ENDPOINT    = ENV['OAUTH_CLIENT_API_URL'] || 'https://www.bitballoon.com'
     API_VERSION = "v1"
+    RETRIES     = 3
 
     class BitBalloonError < StandardError; end
     class NotFoundError < BitBalloonError; end
@@ -51,25 +52,43 @@ module BitBalloon
     end
 
     def request(verb, path, opts={}, &block)
-      raise AuthenticationError, "Authorize with BitBalloon before making requests" unless oauth_token
+      retries = 0
+      begin
+        raise AuthenticationError, "Authorize with BitBalloon before making requests" unless oauth_token
 
-      oauth_token.request(verb, ::File.join("/api", API_VERSION, path), opts, &block)
-    rescue OAuth2::Error => e
-      case e.response.status
-      when 401
-        raise AuthenticationError, message_for(e, "Authentication Error")
-      when 404
-        raise NotFoundError, message_for(e, "Not Found")
-      when 500
-        raise InternalServerError, message_for(e, "Internal Server Error")
-      else
-        raise BitBalloonError, message_for(e, "OAuth2 Error")
+        oauth_token.request(verb, ::File.join("/api", API_VERSION, path), opts, &block)
+      rescue OAuth2::Error => e
+        case e.response.status
+        when 401
+          raise AuthenticationError, message_for(e, "Authentication Error")
+        when 404
+          raise NotFoundError, message_for(e, "Not Found")
+        when 500
+          if retry_request?(verb, e.response.status, retries)
+            retries += 1
+            retry
+          else
+            raise InternalServerError, message_for(e, "Internal Server Error")
+          end
+        else
+          raise BitBalloonError, message_for(e, "OAuth2 Error")
+        end
+      rescue Faraday::Error::ConnectionFailed, Faraday::Error::TimeoutError => e
+        if retry_request?(verb, e.response && e.response.status, retries)
+          retries += 1
+          retry
+        else
+          raise ConnectionError, message_for(e, "Connection Error")
+        end
       end
-    rescue Faraday::Error::ConnectionFailed => e
-      raise ConnectionError, message_for(e, "Connection Error")
     end
 
     private
+    def retry_request?(http_verb, status_code, retries)
+      return false unless [:get, :put, :delete, :head].include?(http_verb.to_s.downcase.to_sym)
+      return retries < 3 unless status_code && status_code == 422
+    end
+
     def oauth_token
       @oauth_token ||= access_token && OAuth2::AccessToken.new(oauth, access_token)
     end

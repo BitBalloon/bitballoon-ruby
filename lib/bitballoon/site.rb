@@ -19,6 +19,7 @@ module BitBalloon
       end
 
       (required || []).each do |sha|
+        puts "Uploading #{shas[sha]}"
         client.request(:put, ::File.join(path, "files", URI.encode(shas[sha])), :body => ::File.read(::File.join(dir, shas[sha])), :headers => {"Content-Type" => "application/octet-stream"})
       end
 
