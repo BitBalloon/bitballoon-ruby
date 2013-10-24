@@ -10,17 +10,21 @@ module BitBalloon
     def upload_dir(dir)
       return unless state == "uploading"
 
-      shas = {}
+      shas = Hash.new { [] }
       Dir[::File.join(dir, "**", "*")].each do |file|
         next unless ::File.file?(file)
         pathname = ::File.join("/", file[dir.length..-1])
         next if pathname.match(/(^\/?__MACOSX\/|\/\.)/)
-        shas[Digest::SHA1.hexdigest(::File.read(file))] = pathname
+        sha = Digest::SHA1.hexdigest(::File.read(file))
+        shas[sha] = shas[sha] + [pathname]
       end
 
+
       (required || []).each do |sha|
-        puts "Uploading #{shas[sha]}"
-        client.request(:put, ::File.join(path, "files", URI.encode(shas[sha])), :body => ::File.read(::File.join(dir, shas[sha])), :headers => {"Content-Type" => "application/octet-stream"})
+        shas[sha].each do |pathname|
+          puts "Uploading #{pathname}"
+          client.request(:put, ::File.join(path, "files", URI.encode(pathname)), :body => ::File.read(::File.join(dir, pathname)), :headers => {"Content-Type" => "application/octet-stream"})
+        end
       end
 
       refresh
