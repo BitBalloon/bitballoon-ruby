@@ -149,7 +149,7 @@ site.wait_for_ready
 Update the name of the site (its subdomain), the custom domain and the notification email for form submissions:
 
 ```ruby
-    site.update(:name => "my-site", :custom_domain => "www.example.com", :notification_email => "me@example.com")
+    site.update(:name => "my-site", :custom_domain => "www.example.com", :notification_email => "me@example.com", :password => "secret-password")
 ```
 
 Deleting a site:
