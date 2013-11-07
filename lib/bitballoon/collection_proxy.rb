@@ -19,7 +19,7 @@ module BitBalloon
     end
 
     def all(options = {})
-      response = client.request(:get, [prefix, path].compact.join("/"), options)
+      response = client.request(:get, [prefix, path].compact.join("/"), {:params => options})
       response.parsed.map {|attributes| model.new(client, attributes) } if response.parsed
     end
 
