@@ -39,6 +39,15 @@ module BitBalloon
       self
     end
 
+    def update(attributes)
+      response = client.request(:put, path, attributes)
+      process(response.parsed) if response.parsed
+    end
+
+    def destroy
+      client.request(:delete, path)
+    end
+
     def refresh
       response = client.request(:get, path)
       process(response.parsed)

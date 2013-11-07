@@ -158,6 +158,74 @@ Deleting a site:
     site.destroy!
 ```
 
+Deploys
+=======
+
+Access all deploys for a site
+
+```ruby
+site = bitballoon.sites.get(site_id)
+site.deploys.all
+```
+
+Access a specific deploy
+
+```ruby
+site = bitballoon.sites.get(site_id)
+site.deploys.get(id)
+```
+
+Restore a deploy (makes it the current live version of the site)
+
+```ruby
+site.deploys.get(id).restore
+```
+
+Users
+=====
+
+Access all users you have access to
+
+```ruby
+bitballoon.users.all
+```
+
+Access a specific user
+
+```ruby
+bitballoon.users.get(id)
+```
+
+Create a user. **Reseller only**. A unique email is required. You can optionally include a unique uid, typically the database ID you use for the user on your end.
+
+```ruby
+bitballoon.users.create(:email => "some@email.com", :uid => "12345")
+```
+
+Update a user. **Reseller only**.
+
+```ruby
+bitballoon.users.get(id).update(:email => "new@email.com", :uid => "12345")
+```
+
+Delete a user. **Reseller only**
+
+```ruby
+bitballoon.users.get(id).destroy
+```
+
+Get all sites for a user
+
+```ruby
+bitballoon.users.get(id).sites
+```
+
+Get all form submissions for a user
+
+```ruby
+bitballoon.users.get(id).submissions
+```
+
 Forms
 =====
 
@@ -234,12 +302,44 @@ Snippets
 Snippets are small code snippets injected into all HTML pages of a site right before the closing head or body tag. To get all snippets for a site:
 
 ```ruby
-    site = bitballoon.sites.get(id)
-    site.snippets.all
+site = bitballoon.sites.get(id)
+site.snippets.all
 ```
 
 Get a specific snippet
 
 ```ruby
-    site.snippets.get(0)
+site.snippets.get(0)
 ```
+
+Add a snippet to a site.
+
+You can specify a `general` snippet that will be inserted into all pages, and a `goal` snippet that will be injected into a page following a successful form submission. Each snippet must have a title. You can optionally set the position of both the general and the goal snippet to `head` or `footer` to determine if it gets injected into the head tag or at the end of the page.
+
+```ruby
+site.snippets.create(
+  :general => general_snippet,
+  :general_position => "footer",
+  :goal => goal_snippet,
+  :goal_position => "head",
+  :title => "My Snippet"
+)
+```
+
+Update a snippet
+
+```ruby
+site.snippets.get(id).update(
+  :general => general_snippet,
+  :general_position => "footer",
+  :goal => goal_snippet,
+  :goal_position => "head",
+  :title => "My Snippet"
+)
+```
+
+Remove a snippet
+
+```ruby
+site.snippet.get(id).destroy
+end

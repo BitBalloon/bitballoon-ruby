@@ -8,6 +8,7 @@ require "bitballoon/forms"
 require "bitballoon/submissions"
 require "bitballoon/files"
 require "bitballoon/snippets"
+require "bitballoon/users"
 require "bitballoon/deploys"
 require "bitballoon/multipass"
 

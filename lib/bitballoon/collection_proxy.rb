@@ -18,8 +18,8 @@ module BitBalloon
       self.prefix = prefix
     end
 
-    def all
-      response = client.request(:get, [prefix, path].compact.join("/"))
+    def all(options = {})
+      response = client.request(:get, [prefix, path].compact.join("/"), options)
       response.parsed.map {|attributes| model.new(client, attributes) } if response.parsed
     end
 
@@ -29,6 +29,11 @@ module BitBalloon
 
     def get(id)
       response = client.request(:get, ::File.join(path, id))
+      model.new(client, response.parsed) if response.parsed
+    end
+
+    def create(attributes)
+      response = client.request(:post, path, attributes)
       model.new(client, response.parsed) if response.parsed
     end
 

@@ -51,6 +51,10 @@ module BitBalloon
       Submissions.new(self)
     end
 
+    def users
+      Users.new(self)
+    end
+
     def request(verb, path, opts={}, &block)
       retries = 0
       begin

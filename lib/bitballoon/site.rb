@@ -82,6 +82,10 @@ module BitBalloon
       Snippets.new(client, path)
     end
 
+    def deploys
+      Deploys.new(client, path)
+    end
+
     private
     def mutable_attributes(attributes)
       Hash[*[:name, :custom_domain, :password, :notification_email].map {|key|
