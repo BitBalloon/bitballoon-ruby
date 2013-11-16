@@ -10,6 +10,8 @@ require "bitballoon/files"
 require "bitballoon/snippets"
 require "bitballoon/users"
 require "bitballoon/deploys"
+require "bitballoon/dns_zones"
+require "bitballoon/access_tokens"
 require "bitballoon/multipass"
 
 module BitBalloon; end

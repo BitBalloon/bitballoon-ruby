@@ -55,6 +55,14 @@ module BitBalloon
       Users.new(self)
     end
 
+    def dns_zones
+      DnsZones.new(self)
+    end
+
+    def access_tokens
+      AccessTokens.new(self)
+    end
+
     def request(verb, path, opts={}, &block)
       retries = 0
       begin

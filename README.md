@@ -344,3 +344,64 @@ Remove a snippet
 site.snippet.get(id).destroy
 end
 ```
+
+DNS Zones
+=========
+
+Resellers can manage DNS Zones through the ruby client. To use this feature your access token must belong to a reseller administrator.
+
+Create a DNS Zone
+
+```ruby
+bitballoon.dns_zones.create(:name => "www.example.com", :user_id => "1234")
+```
+
+Get all DNS Zones
+
+```ruby
+bitballoon.dns_zones.all
+```
+
+Delete a DNS Zone
+
+```ruby
+dns_zone.destroy
+```
+
+Get all dns records for a zone
+
+```ruby
+dns_zone.dns_records.all
+```
+
+Adding a new record (supported types: A, CNAME, TXT, MX)
+
+```ruby
+dns_zone.dns_records.create(:hostname => "www", :type => "CNAME", :value => "bitballoon.com", :ttl => "500")
+```
+
+Deleting a record
+
+```ruby
+dns_record.destroy
+```
+
+Access Tokens
+=============
+
+Resellers can create and revoke access tokens on behalf of their users. To use this feature your access token must belong to a reseller administrator.
+
+Create access token:
+
+```ruby
+bitballoon.access_tokens.create(:user => {:email => "test@example.com", :uid => 123})
+```
+
+The user must have either an email or a uid or both. Both email and uid must be unique within your reseller account. The uid would typically correspond to your internal database id for the user. If the users doesn't exist, a new user will be created on the fly.
+
+Revoke access token:
+
+```ruby
+bitballoon.access_tokens.get("token-string").destroy
+```
+

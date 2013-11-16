@@ -1,6 +1,6 @@
 module BitBalloon
   class Model
-    attr_reader :client, :attributes
+    attr_reader :client, :attributes, :prefix
 
     def self.fields(*names)
       return @fields if names.empty?
@@ -27,6 +27,7 @@ module BitBalloon
     def initialize(client, attributes)
       @client = client
       @attributes = {}
+      @prefix = attributes.delete(:prefix)
       process(attributes)
     end
 
@@ -40,7 +41,7 @@ module BitBalloon
     end
 
     def update(attributes)
-      response = client.request(:put, path, attributes)
+      response = client.request(:put, path, :body => attributes)
       process(response.parsed) if response.parsed
     end
 
@@ -58,7 +59,7 @@ module BitBalloon
     end
 
     def path
-      ::File.join(collection.path, id)
+      ::File.join(*[prefix, collection.path, id.to_s].compact)
     end
   end
 end
