@@ -80,6 +80,13 @@ Or a zip file:
 bitballoon deploy /path/to/my/site.zip
 ```
 
+If there is no .bitballoon file yet, you can deploy to an existing site by passing in the ID:
+
+```ruby
+bitballoon deploy /path/to/my/site.zip --site-id YOUR_SITE_ID
+```
+
+
 Sites
 =====
 
