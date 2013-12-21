@@ -32,9 +32,11 @@ opts = Slop.parse do
         puts "Please enter your BitBalloon API Credentials (if you don't have any, you can create your credentials at https://www.bitballoon.com/applications)"
         client_id = ask("Client ID:")
         client_secret = ask("Client Secret:")
+        site_url = ask("Site to deploy to (paste the URL - leave blank for new site):")
         client = BitBalloon::Client.new(:client_id => client_id, :client_secret => client_secret)
         client.authorize_from_credentials!
-        credentials = {'access_token' => client.access_token}
+        site_match = site_url.match(/(https?:\/\/)?([^\/]+)/)
+        credentials = {'access_token' => client.access_token, 'site_id' => site_match ? site_match[2] : nil}
       end
 
       credentials['site_id'] = opts[:s] if opts[:s]
