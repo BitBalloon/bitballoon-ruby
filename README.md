@@ -3,6 +3,16 @@ BitBalloon Ruby Client
 
 BitBalloon is a hosting service for the programmable web. It understands your documents, processes forms and lets you do deploys, manage forms submissions, inject javascript snippets into sites and do intelligent updates of HTML documents through it's API.
 
+The basic flow to using the ruby client is:
+
+1. Authenticate (via creds or a previously aquired access token)
+2. Get site (via id)
+3. Deploy
+  * If site has not been deployed to yet, then the above step will throw a `not found` exception, and you'll need to use `bitballoon.sites.create` to create and initially deploy.
+  * If the site has already been deployed and the above step was successful, then you can simply use `site.update` to re-deploy.
+
+If you'd rather, there's also a command line utility to handle most of these steps: `bitballoon deploy`.
+
 Installation
 ============
 
@@ -58,7 +68,7 @@ And the client will be ready to do requests. This means that once you've gotten 
 Command Line Utility
 ====================
 
-The BitBalloon gem comes with a handy command line utility for deploying and redeploying sites.
+The BitBalloon gem comes with a handy command line utility for deploying and redeploying sites. (See the "Deploys" section below to deploy within a ruby script, like a Rakefile.)
 
 To deploy the site in the current working directory:
 
