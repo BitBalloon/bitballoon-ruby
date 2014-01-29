@@ -139,7 +139,7 @@ Refresh a site to update the state:
     site.refresh
 ```
 
-Use `wait_until_ready` to wait until a site has finished processing.
+Use `wait_for_ready` to wait until a site has finished processing.
 
 ```ruby
 site = bitballoon.sites.create(:dir => "/tmp/my-site")
