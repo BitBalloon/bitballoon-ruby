@@ -114,10 +114,10 @@ Getting a specific site by id:
 site = bitballoon.sites.get(id)
 ```
 
-Creating a site from a directory:
+Creating a site from a directory: _(note the path given is a system path)_
 
 ```ruby
-site = bitballoon.sites.create(:dir => "/tmp/my-site")
+site = bitballoon.sites.create(:dir => "my-site")
 ```
 
 Creating a site from a zip file:
