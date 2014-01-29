@@ -5,11 +5,11 @@ BitBalloon is a hosting service for the programmable web. It understands your do
 
 The basic flow to using the ruby client is:
 
-1. Authenticate (via creds or a previously aquired access token)
+1. Authenticate (via credentials or a previously aquired access token)
 2. Get site (via id)
 3. Deploy
-  * If site has not been deployed to yet, then the above step will throw a `not found` exception, and you'll need to use `bitballoon.sites.create` to create and initially deploy.
-  * If the site has already been deployed and the above step was successful, then you can simply use `site.update` to re-deploy.
+  * If site has not been deployed to yet, then the above step will throw a `not found` exception, and you'll need to use `bitballoon.sites.create` to create the site and do the initial deploy.
+  * If the site has already been deployed and the above step was successful, you can simply use `site.update` to re-deploy.
 
 If you'd rather, there's also a command line utility to handle most of these steps: `bitballoon deploy`.
 
