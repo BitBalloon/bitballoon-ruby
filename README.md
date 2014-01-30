@@ -62,7 +62,7 @@ If you already have an OAuth2 `access_token` you can instantiate the client like
 bitballoon = BitBalloon::Client.new(:access_token => access_token)
 ```
 
-And the client will be ready to do requests. This means that once you've gotten a token via `authorize!` or `authorize_from_credentials!` you can store it and reuse it for later sessions.
+And the client will be ready to do requests without having to use `authorize_from_credentials`. This means that once you've gotten a token via `authorize_from_credentials!` you can store it and reuse it for later sessions.
 
 
 Command Line Utility
@@ -104,21 +104,25 @@ Getting a list of all sites you have access to:
 
 ```ruby
 bitballoon.sites.each do |site|
+  puts site.id
   puts site.url
 end
 ```
 
-Getting a specific site by id:
+Each site has a unique, system generated id. Getting a specific site by id:
 
 ```ruby
 site = bitballoon.sites.get(id)
 ```
 
-Creating a site from a directory:
+Creating a site from a directory: _(note the path given is a system path)_
 
 ```ruby
-site = bitballoon.sites.create(:dir => "/tmp/my-site")
+site = bitballoon.sites.create(:dir => "my-site")
+puts site.id
 ```
+
+You'll want to then save that site id for future reference. Note that a site can also be looked up by its `url`.
 
 Creating a site from a zip file:
 
