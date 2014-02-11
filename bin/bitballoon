@@ -43,6 +43,8 @@ opts = Slop.parse do
 
       attributes = zip ? {:zip => path} : {:dir => path}
 
+      puts "Deploying site"
+
       if credentials['site_id']
         site = client.sites.get(credentials['site_id'])
         site.update(attributes)
