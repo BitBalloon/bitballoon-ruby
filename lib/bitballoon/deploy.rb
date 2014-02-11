@@ -5,7 +5,7 @@ module BitBalloon
            :user_id, :required
 
     def restore
-      response = client.request(:post, File.join(path, "restore"))
+      response = client.request(:post, ::File.join(path, "restore"))
       process(response.parsed)
       self
     end
