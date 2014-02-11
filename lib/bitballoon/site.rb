@@ -11,7 +11,9 @@ module BitBalloon
       return unless state == "uploading"
 
       shas = Hash.new { [] }
-      Dir[::File.join(dir, "**", "*")].each do |file|
+      glob = ::File.join(dir, "**", "*")
+      
+      Dir.glob(glob) do |file|
         next unless ::File.file?(file)
         pathname = ::File.join("/", file[dir.length..-1])
         next if pathname.match(/(^\/?__MACOSX\/|\/\.)/)
