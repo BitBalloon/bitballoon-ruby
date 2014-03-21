@@ -9,7 +9,7 @@ module BitBalloon
     def initialize(multipass_secret)
       ### Use the Multipass secret to derive two cryptographic keys,
       ### one for encryption, one for signing
-      key_material = OpenSSL::Digest::Digest.new("sha256").digest(multipass_secret)
+      key_material = OpenSSL::Digest.new("sha256").digest(multipass_secret)
       @encryption_key = key_material[ 0,16]
       @signature_key  = key_material[16,16]
     end

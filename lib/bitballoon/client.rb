@@ -12,13 +12,14 @@ module BitBalloon
     class InternalServerError < BitBalloonError; end
     class AuthenticationError < BitBalloonError; end
 
-    attr_accessor :client_id, :client_secret, :oauth, :access_token
+    attr_accessor :client_id, :client_secret, :oauth, :access_token, :endpoint
 
     def initialize(options)
       self.client_id     = options[:client_id]
       self.client_secret = options[:client_secret]
       self.access_token  = options[:access_token]
-      self.oauth         = OAuth2::Client.new(client_id, client_secret, :site => ENDPOINT, :connection_build => lambda {|f|
+      self.endpoint      = options[:endpoint] || ENDPOINT
+      self.oauth         = OAuth2::Client.new(client_id, client_secret, :site => endpoint, :connection_build => lambda {|f|
         f.request :multipart
         f.request :url_encoded
         f.adapter :net_http

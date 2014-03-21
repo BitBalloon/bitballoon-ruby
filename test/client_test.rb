@@ -8,8 +8,12 @@ class ClientTest < MiniTest::Unit::TestCase
   end
 
   def test_authorize_url
-    expected = "https://www.bitballoon.com/oauth/authorize?response_type=code&client_id=client_id&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback"
-    assert_equal expected, client.authorize_url(:redirect_uri => "http://example.com/callback")
+    expected = URI.parse("https://www.bitballoon.com/oauth/authorize?response_type=code&client_id=client_id&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback")
+    actual   = URI.parse(client.authorize_url(:redirect_uri => "http://example.com/callback"))
+    assert_equal expected.scheme, actual.scheme
+    assert_equal expected.host,   actual.host
+    assert_equal expected.port,   actual.port
+    assert_equal expected.query.split("&").sort, actual.query.split("&").sort
   end
 
   def test_authorize_from_code

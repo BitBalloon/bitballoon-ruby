@@ -12,7 +12,7 @@ module BitBalloon
 
       shas = Hash.new { [] }
       glob = ::File.join(dir, "**", "*")
-      
+
       Dir.glob(glob) do |file|
         next unless ::File.file?(file)
         pathname = ::File.join("/", file[dir.length..-1])
@@ -24,7 +24,6 @@ module BitBalloon
 
       (required || []).each do |sha|
         shas[sha].each do |pathname|
-          puts "Uploading #{pathname}"
           client.request(:put, ::File.join(path, "files", URI.encode(pathname)), :body => ::File.read(::File.join(dir, pathname)), :headers => {"Content-Type" => "application/octet-stream"})
         end
       end
