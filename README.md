@@ -64,6 +64,8 @@ bitballoon = BitBalloon::Client.new(:access_token => access_token)
 
 And the client will be ready to do requests without having to use `authorize_from_credentials`. This means that once you've gotten a token via `authorize_from_credentials!` you can store it and reuse it for later sessions.
 
+If you're authenticating via the `access_token` and you'd like to test if you have a valid `access_token`, you can attempt to make a request with the bitballoon client and if the token is invalid, a `BitBalloon::Client::AuthenticationError` will be raised. See Miles Matthias' [BitBalloon Rakefile](https://github.com/milesmatthias/bitballoon-rakefile) for an example.
+
 
 Command Line Utility
 ====================
