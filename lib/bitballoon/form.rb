@@ -3,7 +3,7 @@ module BitBalloon
     fields :id, :site_id, :name, :paths, :submission_count, :fields, :created_at
 
     def submissions
-      Submissions.new(client, path).all
+      Submissions.new(client, path)
     end
   end
 end
