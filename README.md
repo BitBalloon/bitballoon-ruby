@@ -28,7 +28,7 @@ or put it in a Gemfile and run `bundle install`
 Authenticating
 ==============
 
-You'll need an application client id and a client secret before you can access the BitBalloon API. Please contact us at team@bitballoon.com for your credentials.
+Register a new application at https://www.bitballoon.com/applications to get your Oauth2 secret and key.
 
 Once you have your credentials you can instantiate a BitBalloon client.
 
