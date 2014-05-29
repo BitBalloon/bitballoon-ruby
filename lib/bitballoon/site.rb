@@ -4,32 +4,8 @@ require 'uri'
 module BitBalloon
   class Site < Model
     fields :id, :state, :premium, :claimed, :name, :custom_domain, :url,
-           :admin_url, :deploy_url, :screenshot_url, :created_at, :updated_at,
-           :password, :notification_email, :user_id, :required, :error_message
-
-    def upload_dir(dir)
-      return unless state == "uploading"
-
-      shas = Hash.new { [] }
-      glob = ::File.join(dir, "**", "*")
-
-      Dir.glob(glob) do |file|
-        next unless ::File.file?(file)
-        pathname = ::File.join("/", file[dir.length..-1])
-        next if pathname.match(/(^\/?__MACOSX\/|\/\.)/)
-        sha = Digest::SHA1.hexdigest(::File.read(file))
-        shas[sha] = shas[sha] + [pathname]
-      end
-
-
-      (required || []).each do |sha|
-        shas[sha].each do |pathname|
-          client.request(:put, ::File.join(path, "files", URI.encode(pathname)), :body => ::File.read(::File.join(dir, pathname)), :headers => {"Content-Type" => "application/octet-stream"})
-        end
-      end
-
-      refresh
-    end
+           :admin_url, :deploy_id, :deploy_url, :screenshot_url, :created_at, :updated_at,
+           :password, :notification_email, :user_id, :error_message, :required
 
     def ready?
       state == "current"
@@ -39,25 +15,19 @@ module BitBalloon
       state == "error"
     end
 
-    def wait_for_ready(timeout = 900)
-      start = Time.now
-      while !(ready?)
-        sleep 5
-        refresh
-        raise "Error processing site: #{error_message}" if error?
-        yield(self) if block_given?
-        raise "Timeout while waiting for ready" if Time.now - start > timeout
-      end
+    def wait_for_ready(timeout = 900, &block)
+      deploy = deploys.get(deploy_id)
+      raise "Error fetching deploy #{deploy_id}" unless deploy
+      deploy.wait_for_ready(timeout, &block)
       self
     end
 
     def update(attributes)
+      response = client.request(:put, path, :body => mutable_attributes(attributes))
+      process(response.parsed)
       if attributes[:zip] || attributes[:dir]
-        site = collection.new(client).create(attributes.merge(:id => id))
-        process(site.attributes)
-      else
-        response = client.request(:put, path, :body => mutable_attributes(attributes))
-        process(response.parsed)
+        deploy = deploys.create(attributes)
+        self.deploy_id = deploy.id
       end
       self
     end

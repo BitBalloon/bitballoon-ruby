@@ -132,17 +132,13 @@ Creating a site from a zip file:
 site = bitballoon.sites.create(:zip => "/tmp/my-site.zip")
 ```
 
-Both methods will create the site and upload the files. The site will then be processing.
+Both methods will create the site and upload the files to a new deploy.
+
+Creating a site with a dir or a zip is actually a shortcut for something like this:
 
 ```ruby
-site.state == "processing"
-site.processing? == true
-```
-
-Refresh a site to update the state:
-
-```ruby
-    site.refresh
+site = bitballoon.sites.create(:name => "unique-site-subdomain", :custom_domain => "www.example.com")
+deploy = site.deploys.create(:dir => "path/to/my-site")
 ```
 
 Use `wait_for_ready` to wait until a site has finished processing.
@@ -153,20 +149,29 @@ site.wait_for_ready
 site.state == "ready"
 ```
 
+This also works on a specific deploy, and you can pass in a block to execute after each polling action:
+
+```ruby
+deploy = site.deploys.create(:dir => "/tmp/my-site")
+deploy.wait_for_ready do |deploy|
+  puts "Current state: #{deploy.state}"
+end
+```
+
 Redeploy a site from a dir:
 
 ```ruby
 site = bitballoon.sites.get(site_id)
-site.update(:dir => "/tmp/my-site")
-site.wait_for_ready
+deploy = site.deploys.create(:dir => "/tmp/my-site")
+deploy.wait_for_ready
 ```
 
 Redeploy a site from a zip file:
 
 ```ruby
 site = bitballoon.sites.get(site_id)
-site.update(:zip => "/tmp/my-site.zip")
-site.wait_for_ready
+deploy = site.deploys.create(:zip => "/tmp/my-site.zip")
+deploy.wait_for_ready
 ```
 
 Update the name of the site (its subdomain), the custom domain and the notification email for form submissions:
@@ -195,13 +200,19 @@ Access a specific deploy
 
 ```ruby
 site = bitballoon.sites.get(site_id)
-site.deploys.get(id)
+deploy = site.deploys.get(id)
 ```
 
 Restore a deploy (makes it the current live version of the site)
 
 ```ruby
 site.deploys.get(id).restore
+```
+
+Create a new deploy
+
+```ruby
+deploy = site.deploys.create(:dir => "/tmp/my-site")
 ```
 
 Users
@@ -427,4 +438,3 @@ Revoke access token:
 ```ruby
 bitballoon.access_tokens.get("token-string").destroy
 ```
-
