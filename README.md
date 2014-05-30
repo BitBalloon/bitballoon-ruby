@@ -28,7 +28,7 @@ or put it in a Gemfile and run `bundle install`
 Authenticating
 ==============
 
-You'll need an application client id and a client secret before you can access the BitBalloon API. Please contact us at team@bitballoon.com for your credentials.
+Register a new application at https://www.bitballoon.com/applications to get your Oauth2 secret and key.
 
 Once you have your credentials you can instantiate a BitBalloon client.
 
@@ -41,7 +41,7 @@ Before you can make any requests to the API, you'll need to authenticate with OA
 If you're authenticating on behalf of a user, you'll need to get a valid access token for that user. Use the BitBalloon client to request an authentication URL:
 
 ```ruby
-url = bitballoon.authorize_url(:redirect_urai => "http://www.example.com/callback")
+url = bitballoon.authorize_url(:redirect_uri => "http://www.example.com/callback")
 ```
 
 The user then visits that URL and will be prompted to authorize your application to access his BitBalloon sites. If she grants permission, she'll be redirected back to the `redirect_uri` provided in the `authorize_url` call. This URL must match the redirect url configured for your BitBalloon application. Once the user comes back to your app, you'll be able to access a `code` query parameter that gives you an authorization code. Use this to finish the OAuth2 flow:
