@@ -7,14 +7,15 @@ module BitBalloon
     def create(attributes)
       if attributes[:dir]
         response = client.request(:post, path,
-          :body => JSON.generate({:files => inventory(attributes[:dir])}),
+          :body => JSON.generate({:files => inventory(attributes[:dir]), :draft => attributes[:draft] || false}),
           :headers => {"Content-Type" => "application/json"}
         )
         Deploy.new(client, response.parsed).tap do |deploy|
           deploy.upload_dir(attributes[:dir])
         end
       elsif attributes[:zip]
-        response = client.request(:post, path,
+        request_path = "#{path}?draft=true" if attributes[:draft]
+        response = client.request(:post, request_path,
           :body => ::File.read(attributes[:zip]),
           :headers => {"Content-Type" => "application/zip"}
         )
@@ -22,6 +23,10 @@ module BitBalloon
       else
         raise "Need dir or zip to create a deploy"
       end
+    end
+
+    def draft(attributes)
+      create(attributes.merge(:draft => true))
     end
 
     private

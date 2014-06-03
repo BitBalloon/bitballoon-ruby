@@ -48,10 +48,11 @@ module BitBalloon
       state == "error"
     end
 
-    def restore
+    def publish
       response = client.request(:post, ::File.join(path, "restore"))
       process(response.parsed)
       self
     end
+    alias :restore :publish
   end
 end
