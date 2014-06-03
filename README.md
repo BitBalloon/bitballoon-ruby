@@ -134,7 +134,7 @@ site = bitballoon.sites.create(:zip => "/tmp/my-site.zip")
 
 Both methods will create the site and upload the files to a new deploy.
 
-Creating a site with a dir or a zip is actually a shortcut for something like this:
+Creating a site with a dir or a zip is actually a shortcut for this:
 
 ```ruby
 site = bitballoon.sites.create(:name => "unique-site-subdomain", :custom_domain => "www.example.com")
@@ -203,10 +203,10 @@ site = bitballoon.sites.get(site_id)
 deploy = site.deploys.get(id)
 ```
 
-Restore a deploy (makes it the current live version of the site)
+Publish a deploy (makes it the current live version of the site)
 
 ```ruby
-site.deploys.get(id).restore
+site.deploys.get(id).publish
 ```
 
 Create a new deploy
@@ -214,6 +214,21 @@ Create a new deploy
 ```ruby
 deploy = site.deploys.create(:dir => "/tmp/my-site")
 ```
+
+Create a draft deploy
+
+```ruby
+deploy = site.deploys.draft(:dir => "/tmp/my-site")
+```
+
+Or
+
+```ruby
+deploy = site.deploys.create(:dir => "/tmp/my-site", :draft => true)
+```
+
+This will upload and process a deploy. You can view the deploy at `deploy.deploy_url` and make it the live version of the site with `deploy.publish`.
+
 
 Users
 =====
