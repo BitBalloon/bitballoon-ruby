@@ -14,7 +14,7 @@ module BitBalloon
           deploy.upload_dir(attributes[:dir])
         end
       elsif attributes[:zip]
-        request_path = "#{path}?draft=true" if attributes[:draft]
+        request_path = attributes[:draft] ? "#{path}?draft=true" : path
         response = client.request(:post, request_path,
           :body => ::File.read(attributes[:zip]),
           :headers => {"Content-Type" => "application/zip"}
