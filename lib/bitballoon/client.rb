@@ -86,7 +86,7 @@ module BitBalloon
         else
           raise BitBalloonError, message_for(e, "OAuth2 Error")
         end
-      rescue Faraday::Error::ConnectionFailed, Faraday::Error::TimeoutError => e
+      rescue Faraday::Error::ConnectionFailed, Faraday::Error::TimeoutError, Timeout::Error => e
         if retry_request?(verb, e.response && e.response.status, retries)
           retries += 1
           retry
