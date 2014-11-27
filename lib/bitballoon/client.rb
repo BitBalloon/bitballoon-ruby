@@ -70,7 +70,7 @@ module BitBalloon
         raise AuthenticationError, "Authorize with BitBalloon before making requests" unless oauth_token
 
         if ENV['BB_VERBOSE']
-          puts "#{very}, #{::File.join("/api", API_VERSION, path)}"
+          puts "#{verb}, #{::File.join("/api", API_VERSION, path)}"
         end
         oauth_token.request(verb, ::File.join("/api", API_VERSION, path), opts, &block)
       rescue OAuth2::Error => e
