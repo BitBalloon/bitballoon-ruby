@@ -19,7 +19,11 @@ module BitBalloon
       self.client_secret = options[:client_secret]
       self.access_token  = options[:access_token]
       self.endpoint      = options[:endpoint] || ENDPOINT
-      self.oauth         = OAuth2::Client.new(client_id, client_secret, :site => endpoint, :connection_build => lambda {|f|
+      ssl_options = {}
+      ssl_options[:version] = :TLSv1_2
+      ssl = {}
+      ssl[:ssl] =  ssl_options
+      self.oauth         = OAuth2::Client.new(client_id, client_secret, :client_options => { connection_opts: ssl }, :site => endpoint, :connection_build => lambda {|f|
         f.request :multipart
         f.request :url_encoded
         f.adapter :net_http
